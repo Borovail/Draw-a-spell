@@ -108,6 +108,7 @@ public class RecognitionManager : MonoBehaviour
             }
             else if (_currentRecognizer is DollarPRecognizer)
             {
+                if (ParticleManager.Instance != null) ParticleManager.Instance.SpawnParticle(result.Item1, result.Item2);
                 resultText = $"Recognized: {result.Item1}, Distance: {result.Item2}";
             }
 

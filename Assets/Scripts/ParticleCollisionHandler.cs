@@ -27,15 +27,22 @@ public class ParticleCollisionHandler : MonoBehaviour
         // Проходим по всем событиям столкновений
         for (int i = 0; i < numCollisionEvents; i++)
         {
-            // Точка пересечения
-            Vector3 pos = collisionEvents[i].intersection;
-
             // Направление силы: противоположное вектору скорости частицы
-            Vector3 direction = -collisionEvents[i].velocity.normalized;
+            Vector3 direction = collisionEvents[i].velocity.normalized;
 
             // Суммируем направления столкновений
             totalForceDirection += (Vector2)direction;
             collisionCount++;
+
+            // Дополнительно учитываем скорость (модуль) частицы
+            float particleSpeed = collisionEvents[i].velocity.magnitude;
+
+            // Масштабируем силу в зависимости от скорости частицы
+            float forceMagnitude = particleSpeed; // Масштабируем с коэффициентом 10 для заметного эффекта
+
+            // Применяем силу в зависимости от скорости частицы
+            rb.AddForce(totalForceDirection.normalized * forceMagnitude, ForceMode2D.Impulse);
+            Debug.Log($"Applying force in direction: {totalForceDirection}, Force magnitude: {forceMagnitude}");
         }
 
         // Если столкновение было, применяем силу
@@ -44,11 +51,8 @@ public class ParticleCollisionHandler : MonoBehaviour
             // Нормализуем направление, чтобы применить силу в одну сторону
             totalForceDirection.Normalize();
 
-            // Сила пропорциональна количеству столкновений
-
-            // Применяем силу в суммарном направлении
-            rb.AddForce(-totalForceDirection * 1, ForceMode2D.Impulse);
-            Debug.Log($"Applying force in direction: {totalForceDirection}, Force magnitude: {1}");
+            // Применяем общую силу (можно оставить, если хочешь обобщить)
+            rb.AddForce(totalForceDirection * 1, ForceMode2D.Impulse);
         }
     }
 }
