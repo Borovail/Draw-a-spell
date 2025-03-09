@@ -60,7 +60,7 @@ public class RecognitionManager : MonoBehaviour
         }
 
         if (_templateModeButton == null)
-            SwitchRecognitionAlgorithm(1);
+            SwitchRecognitionAlgorithm(0);
 
         SetupState(_state);
 
@@ -113,20 +113,31 @@ public class RecognitionManager : MonoBehaviour
             (string, float) result = _currentRecognizer.DoRecognition(points, 64,
                 _templates.RawTemplates);
             string resultText = "";
-            if (result.Item2 <= 0)
+            if (result.Item2 <= 0 || result.Item2 > 5)
             {
                 resultText = "No spell recognized ):";
+                if (SceneManager.GetActiveScene().name != "Startup")
+                    SFXManager.Instance.SpellDrawnIncorrectlyEffect(0.3f);
             }
             else if (_currentRecognizer is DollarOneRecognizer)
             {
                 resultText = $"Recognized: {result.Item1}, Score: {result.Item2}";
+                if (SceneManager.GetActiveScene().name != "Startup")
+                {
+                    ParticleManager.Instance.SetParticle(result.Item1, result.Item2*10);
+                    SFXManager.Instance.PlaySfx(SFXManager.Instance.SpellDrawn, 0.2f);
+                    Drawable.drawable.enabled = false;
+                }
             }
             else if (_currentRecognizer is DollarPRecognizer)
             {
                 resultText = $"Recognized: {result.Item1}, Weakness Factor: {result.Item2}";
                 if (SceneManager.GetActiveScene().name != "Startup")
+                {
                     ParticleManager.Instance.SetParticle(result.Item1, result.Item2);
-                Drawable.drawable.enabled = false;
+                    SFXManager.Instance.PlaySfx(SFXManager.Instance.SpellDrawn, 0.2f);
+                    Drawable.drawable.enabled = false;
+                }
             }
 
             _recognitionResult.text = resultText;

@@ -1,75 +1,57 @@
-using System;
 using System.Collections;
 using Assets.Scripts;
-using EZCameraShake;
 using UnityEngine;
 
 public class SFXManager : Singleton<SFXManager>
 {
     [Header("Audio Source")]
-    // [SerializeField] private AudioSource _musicSource;
-    [SerializeField] private AudioSource _castingSpellSource;
+    [SerializeField] private AudioSource _musicSource;
     [SerializeField] private AudioSource _sfxSource;
-    
+
     [Header("Audio Clips")]
-    public AudioClip casting_spell;
-    public AudioClip take_damage;
-    public AudioClip deal_damage;
-    public AudioClip explosion;
-    public AudioClip fire_spell;
-    public AudioClip wind_spell;
-    public AudioClip water_spell;
+    public AudioClip SpellDrawn;
+    public AudioClip SpellCasted;
+    public AudioClip MonsterDeath;
+    public AudioClip SpellDrawnIncorrectly;
 
     private void Start()
     {
-        _castingSpellSource.clip = casting_spell;
+        _musicSource.Play();
     }
 
-    public void PlaySfx(AudioClip clip)
+    public void PlaySfx(AudioClip clip, float volume=0)
     {
+        if (volume != 0)
+            _sfxSource.volume = volume;
         _sfxSource.PlayOneShot(clip);
     }
 
-    public void DealDamageEffect()
+    private Vector3 originalCameraPos;
+    private float shakeDuration = 0.2f;
+    private float shakeMagnitude = 0.1f;
+
+    public void SpellDrawnIncorrectlyEffect(float volume =0f)
     {
-        _sfxSource.PlayOneShot(take_damage);
-        CameraShaker.Instance.ShakeOnce(2,2,0,1);
+        PlaySfx(SpellDrawnIncorrectly, volume);
+        StartCoroutine(CameraShake());
     }
 
-    public void StartCastingSpellEffect()
+    private IEnumerator CameraShake()
     {
-        _castingSpellSource.Play();
-    }
-    
-    public void StopCastingSpellEffect()
-    {
-        _castingSpellSource.Stop();
-    }
-    
-    public void TakeDamageEffect()
-    {
-        _sfxSource.PlayOneShot(deal_damage);
-        CameraShaker.Instance.ShakeOnce(3,3,0,1);
-    }
-    
-    public void FireSpellEffect()
-    {
-        _sfxSource.PlayOneShot(fire_spell);
-    }
-    
-    public void WindSpellEffect()
-    {
-        _sfxSource.PlayOneShot(wind_spell);
-    }
-    
-    public void WaterSpellEffect()
-    {
-        _sfxSource.PlayOneShot(water_spell);
+        originalCameraPos = Camera.main.transform.position;
+        float elapsed = 0f;
+
+        while (elapsed < shakeDuration)
+        {
+            float x = Random.Range(-1f, 1f) * shakeMagnitude;
+            float y = Random.Range(-1f, 1f) * shakeMagnitude;
+
+            Camera.main.transform.position = originalCameraPos + new Vector3(x, y, 0);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        Camera.main.transform.position = originalCameraPos;
     }
 
-    public void ExplosionEffect()
-    {
-        _sfxSource.PlayOneShot(explosion);
-        CameraShaker.Instance.ShakeOnce(3,6,0,2);
-    }
 }

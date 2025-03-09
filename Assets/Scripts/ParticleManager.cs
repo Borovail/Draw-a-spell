@@ -43,6 +43,7 @@ public class ParticleManager : Singleton<ParticleManager>
             SpawnParticle();
             _currentSelected = null;
             Invoke(nameof(EnableDrawing), 0.2f);
+            SFXManager.Instance.PlaySfx(SFXManager.Instance.SpellCasted,0.2f);
         }
 
     }

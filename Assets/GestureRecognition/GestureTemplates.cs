@@ -1,8 +1,15 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Assets.Scripts;
 using UnityEngine;
+
+public class CoroutineMonoBehaviour : Singleton<CoroutineMonoBehaviour>
+{
+
+}
 
 [Serializable]
 public class GestureTemplates
@@ -49,14 +56,39 @@ public class GestureTemplates
 
     private void Load()
     {
-        string path = Application.persistentDataPath + "/SavedTemplates.json";
-        if (File.Exists(path))
+        string path;
+
+#if UNITY_WEBGL
+        path = Application.streamingAssetsPath + "/SavedTemplates.json";
+#else
+    path = Application.persistentDataPath + "/SavedTemplates.json";
+#endif
+
+        Debug.Log("Loading file from: " + path);
+        CoroutineMonoBehaviour.Instance.StartCoroutine(LoadFromWeb(path));
+    }
+
+    private IEnumerator LoadFromWeb(string path)
+    {
+        using (UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(path))
         {
-            GestureTemplates data = JsonUtility.FromJson<GestureTemplates>(File.ReadAllText(path));
-            RawTemplates.Clear();
-            RawTemplates.AddRange(data.RawTemplates);
-            ProceedTemplates.Clear();
-            ProceedTemplates.AddRange(data.ProceedTemplates);
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
+            {
+                string json = www.downloadHandler.text;
+                GestureTemplates data = JsonUtility.FromJson<GestureTemplates>(json);
+
+                RawTemplates = data.RawTemplates ?? new List<RecognitionManager.GestureTemplate>();
+                ProceedTemplates = data.ProceedTemplates ?? new List<RecognitionManager.GestureTemplate>();
+
+                Debug.Log("Templates loaded successfully!");
+            }
+            else
+            {
+                Debug.LogError("Failed to load templates: " + www.error);
+            }
         }
     }
+
 }
