@@ -160,7 +160,6 @@ namespace FreeDraw
 
                 // Check if the current mouse position overlaps our image
                 Collider2D hit = Physics2D.OverlapPoint(mouse_world_position, Drawing_Layers.value);
-                Debug.Log(hit);
                 if (hit != null && hit.transform != null)
                 {
                     // We're over the texture we're drawing on!
@@ -192,13 +191,14 @@ namespace FreeDraw
                 _strokeIndex++;
             }
 
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Mouse1))
             {
                 OnDrawFinished?.Invoke(_drawPoints.ToArray());
                 previous_drag_position = Vector2.zero;
                 no_drawing_on_current_drag = false;
                 ResetCanvas(drawable_texture);
                 _strokeIndex = 0;
+                mouse_was_previously_held_down = mouse_held_down;
             }
 
             mouse_was_previously_held_down = mouse_held_down;

@@ -8,6 +8,8 @@ public class DollarPRecognizer : Recognizer, IRecognizer
     public (string, float) DoRecognition(DollarPoint[] points, int n,
         List<RecognitionManager.GestureTemplate> gestureTemplates)
     {
+        if (points.Length == 0) return ("",-1);
+
         DollarPoint[] normalizedPoints = Normalize(points, n);
         RecognitionManager.GestureTemplate winnerGesture = new RecognitionManager.GestureTemplate();
         float minDistance = Mathf.Infinity;
@@ -25,7 +27,7 @@ public class DollarPRecognizer : Recognizer, IRecognizer
             }
         }
 
-        return (winnerGesture.Name, minDistance);
+        return minDistance > 6 ? ("", -1) : (winnerGesture.Name, minDistance);
     }
 
     private float GreedyCloudMatch(DollarPoint[] points, DollarPoint[] templatePoints, int n)
@@ -67,7 +69,6 @@ public class DollarPRecognizer : Recognizer, IRecognizer
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogError(ex);
                         return sum;
                     }
                 }

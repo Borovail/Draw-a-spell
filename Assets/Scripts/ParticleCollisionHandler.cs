@@ -6,6 +6,7 @@ public class ParticleCollisionHandler : MonoBehaviour
     public ParticleSystem part;
     public List<ParticleCollisionEvent> collisionEvents;
 
+    public float WeaknessFactor=1;
     private void Start()
     {
         part = GetComponent<ParticleSystem>();
@@ -38,21 +39,20 @@ public class ParticleCollisionHandler : MonoBehaviour
             float particleSpeed = collisionEvents[i].velocity.magnitude;
 
             // Масштабируем силу в зависимости от скорости частицы
-            float forceMagnitude = particleSpeed; // Масштабируем с коэффициентом 10 для заметного эффекта
+            float forceMagnitude = particleSpeed/ WeaknessFactor/5; // Масштабируем с коэффициентом 10 для заметного эффекта
 
             // Применяем силу в зависимости от скорости частицы
             rb.AddForce(totalForceDirection.normalized * forceMagnitude, ForceMode2D.Impulse);
-            Debug.Log($"Applying force in direction: {totalForceDirection}, Force magnitude: {forceMagnitude}");
         }
 
-        // Если столкновение было, применяем силу
-        if (collisionCount > 0)
-        {
-            // Нормализуем направление, чтобы применить силу в одну сторону
-            totalForceDirection.Normalize();
+        //// Если столкновение было, применяем силу
+        //if (collisionCount > 0)
+        //{
+        //    // Нормализуем направление, чтобы применить силу в одну сторону
+        //    totalForceDirection.Normalize();
 
-            // Применяем общую силу (можно оставить, если хочешь обобщить)
-            rb.AddForce(totalForceDirection * 1, ForceMode2D.Impulse);
-        }
+        //    // Применяем общую силу (можно оставить, если хочешь обобщить)
+        //    rb.AddForce(totalForceDirection * 1, ForceMode2D.Impulse);
+        //}
     }
 }

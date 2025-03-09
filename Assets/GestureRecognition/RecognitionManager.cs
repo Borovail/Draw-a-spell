@@ -114,7 +114,7 @@ public class RecognitionManager : MonoBehaviour
             string resultText = "";
             if (result.Item2 <= 0)
             {
-                resultText = "No gesture recognized ):";
+                resultText = "No spell recognized ):      Drawing!!!";
             }
             else if (_currentRecognizer is DollarOneRecognizer)
             {
@@ -122,8 +122,9 @@ public class RecognitionManager : MonoBehaviour
             }
             else if (_currentRecognizer is DollarPRecognizer)
             {
-                resultText = $"Recognized: {result.Item1}, Distance: {result.Item2}";
-                if (ParticleManager.Instance != null) ParticleManager.Instance.SpawnParticle(result.Item1, result.Item2);
+                resultText = $"Recognized: {result.Item1}, Weakness Factor: {result.Item2}";
+                ParticleManager.Instance.SpawnParticle(result.Item1, result.Item2);
+                Drawable.drawable.enabled = false;
             }
 
             _recognitionResult.text = resultText;
