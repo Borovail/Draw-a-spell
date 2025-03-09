@@ -11,6 +11,13 @@ namespace FreeDraw
         public static bool isCursorOverUI = false;
         public float Transparency = 1f;
 
+        private void Start()
+        {
+            SetMarkerRed();
+            SetMarkerWidth(1);
+            SetTransparency(0);
+        }
+
         // Changing pen settings is easy as changing the static properties Drawable.Pen_Colour and Drawable.Pen_Width
         public void SetMarkerColour(Color new_color)
         {

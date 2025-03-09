@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using FreeDraw;
@@ -7,14 +8,15 @@ using UnityEngine.UI;
 
 public class RecognitionManager : MonoBehaviour
 {
-    [SerializeField] private Drawable _drawable;
-    [SerializeField] private TextMeshProUGUI _recognitionResult;
-    [SerializeField] private Button _templateModeButton;
-    [SerializeField] private Button _recognitionModeButton;
-    [SerializeField] private Button _reviewTemplates;
-    [SerializeField] private TMP_InputField _templateName;
-    [SerializeField] private TemplateReviewPanel _templateReviewPanel;
-    [SerializeField] private RecognitionPanel _recognitionPanel;
+    [SerializeField] private Drawable _drawable = null!;
+    [SerializeField] private TextMeshProUGUI _recognitionResult = null!;
+
+    [SerializeField] private Button? _templateModeButton;
+    [SerializeField] private Button? _recognitionModeButton;
+    [SerializeField] private Button? _reviewTemplates;
+    [SerializeField] private TMP_InputField? _templateName;
+    [SerializeField] private TemplateReviewPanel? _templateReviewPanel;
+    [SerializeField] private RecognitionPanel? _recognitionPanel;
 
     private GestureTemplates _templates => GestureTemplates.Get();
     private static readonly DollarOneRecognizer _dollarOneRecognizer = new DollarOneRecognizer();
@@ -48,12 +50,19 @@ public class RecognitionManager : MonoBehaviour
     private void Start()
     {
         _drawable.OnDrawFinished += OnDrawFinished;
-        _templateModeButton.onClick.AddListener(() => SetupState(RecognizerState.TEMPLATE));
-        _recognitionModeButton.onClick.AddListener(() => SetupState(RecognizerState.RECOGNITION));
-        _reviewTemplates.onClick.AddListener(() => SetupState(RecognizerState.TEMPLATE_REVIEW));
-        _recognitionPanel.Initialize(SwitchRecognitionAlgorithm);
+        if (_templateModeButton != null)
+        {
+            _templateModeButton.onClick.AddListener(() => SetupState(RecognizerState.TEMPLATE));
+            _recognitionModeButton.onClick.AddListener(() => SetupState(RecognizerState.RECOGNITION));
+            _reviewTemplates.onClick.AddListener(() => SetupState(RecognizerState.TEMPLATE_REVIEW));
+            _recognitionPanel.Initialize(SwitchRecognitionAlgorithm);
+        }
+
+        if (_templateModeButton == null)
+            SwitchRecognitionAlgorithm(1);
 
         SetupState(_state);
+
     }
 
     private void SwitchRecognitionAlgorithm(int algorithm)
@@ -72,15 +81,20 @@ public class RecognitionManager : MonoBehaviour
     private void SetupState(RecognizerState state)
     {
         _state = state;
-        _templateModeButton.image.color = _state == RecognizerState.TEMPLATE ? Color.green : Color.white;
-        _recognitionModeButton.image.color = _state == RecognizerState.RECOGNITION ? Color.green : Color.white;
-        _reviewTemplates.image.color = _state == RecognizerState.TEMPLATE_REVIEW ? Color.green : Color.white;
-        _templateName.gameObject.SetActive(_state == RecognizerState.TEMPLATE);
+        if (_templateModeButton != null)
+        {
+
+            _templateModeButton.image.color = _state == RecognizerState.TEMPLATE ? Color.green : Color.white;
+            _recognitionModeButton.image.color = _state == RecognizerState.RECOGNITION ? Color.green : Color.white;
+            _reviewTemplates.image.color = _state == RecognizerState.TEMPLATE_REVIEW ? Color.green : Color.white;
+            _templateName.gameObject.SetActive(_state == RecognizerState.TEMPLATE);
+            _templateReviewPanel.SetVisibility(state == RecognizerState.TEMPLATE_REVIEW);
+            _recognitionPanel.SetVisibility(state == RecognizerState.RECOGNITION);
+        }
+
         _recognitionResult.gameObject.SetActive(_state == RecognizerState.RECOGNITION);
 
         _drawable.gameObject.SetActive(state != RecognizerState.TEMPLATE_REVIEW);
-        _templateReviewPanel.SetVisibility(state == RecognizerState.TEMPLATE_REVIEW);
-        _recognitionPanel.SetVisibility(state == RecognizerState.RECOGNITION);
     }
 
     private void OnDrawFinished(DollarPoint[] points)
@@ -108,8 +122,8 @@ public class RecognitionManager : MonoBehaviour
             }
             else if (_currentRecognizer is DollarPRecognizer)
             {
-                if (ParticleManager.Instance != null) ParticleManager.Instance.SpawnParticle(result.Item1, result.Item2);
                 resultText = $"Recognized: {result.Item1}, Distance: {result.Item2}";
+                if (ParticleManager.Instance != null) ParticleManager.Instance.SpawnParticle(result.Item1, result.Item2);
             }
 
             _recognitionResult.text = resultText;

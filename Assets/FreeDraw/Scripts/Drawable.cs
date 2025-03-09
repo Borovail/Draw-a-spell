@@ -9,7 +9,6 @@ using UnityEngine.UI;
 
 namespace FreeDraw
 {
-    [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(Collider2D))] // REQUIRES A COLLIDER2D to function
     // 1. Attach this to a read/write enabled sprite image
     // 2. Set the drawing_layers  to use in the raycast
@@ -17,9 +16,9 @@ namespace FreeDraw
     // 4. Hold down left mouse to draw on this texture!
     public class Drawable : MonoBehaviour
     {
-     
-        public event Action<DollarPoint []> OnDrawFinished;
-        
+
+        public event Action<DollarPoint[]> OnDrawFinished;
+
         // PEN COLOUR
         public static Color Pen_Colour = Color.red; // Change these to change the default drawing settings
 
@@ -56,8 +55,8 @@ namespace FreeDraw
         bool no_drawing_on_current_drag = false;
 
 
-//////////////////////////////////////////////////////////////////////////////
-// BRUSH TYPES. Implement your own here
+        //////////////////////////////////////////////////////////////////////////////
+        // BRUSH TYPES. Implement your own here
 
 
         // When you want to make your own type of brush effects,
@@ -126,7 +125,7 @@ namespace FreeDraw
                 ColourBetween(previous_drag_position, pixel_pos, Pen_Width, Pen_Colour);
             }
 
-            _drawPoints.Add(new DollarPoint(){Point = pixel_pos, StrokeIndex = _strokeIndex});
+            _drawPoints.Add(new DollarPoint() { Point = pixel_pos, StrokeIndex = _strokeIndex });
 
             ApplyMarkedPixelChanges(drawable_texture, cur_colors);
 
@@ -142,7 +141,7 @@ namespace FreeDraw
             // PenBrush is the NAME of the method we want to set as our current brush
             current_brush = PenBrush;
         }
-//////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
 
 
         private int _strokeIndex;
@@ -161,6 +160,7 @@ namespace FreeDraw
 
                 // Check if the current mouse position overlaps our image
                 Collider2D hit = Physics2D.OverlapPoint(mouse_world_position, Drawing_Layers.value);
+                Debug.Log(hit);
                 if (hit != null && hit.transform != null)
                 {
                     // We're over the texture we're drawing on!
@@ -170,12 +170,12 @@ namespace FreeDraw
 
                 else
                 {
-                    // We're not over our destination texture
+                    //    // We're not over our destination texture
                     previous_drag_position = Vector2.zero;
                     if (!mouse_was_previously_held_down)
                     {
-                        // This is a new drag where the user is left clicking off the canvas
-                        // Ensure no drawing happens until a new drag is started
+                        //        // This is a new drag where the user is left clicking off the canvas
+                        //        // Ensure no drawing happens until a new drag is started
                         no_drawing_on_current_drag = true;
                     }
                 }
@@ -191,7 +191,7 @@ namespace FreeDraw
             {
                 _strokeIndex++;
             }
-            
+
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 OnDrawFinished?.Invoke(_drawPoints.ToArray());
@@ -238,14 +238,14 @@ namespace FreeDraw
         public void MarkPixelsToColour(Vector2 center_pixel, int pen_thickness, Color color_of_pen)
         {
             // Figure out how many pixels we need to colour in each direction (x and y)
-            int center_x = (int) center_pixel.x;
-            int center_y = (int) center_pixel.y;
+            int center_x = (int)center_pixel.x;
+            int center_y = (int)center_pixel.y;
             //int extra_radius = Mathf.Min(0, pen_thickness - 2);
 
             for (int x = center_x - pen_thickness; x <= center_x + pen_thickness; x++)
             {
                 // Check if the X wraps around the image, so we don't draw pixels on the other side of the image
-                if (x >= (int) drawable_sprite.rect.width || x < 0)
+                if (x >= (int)drawable_sprite.rect.width || x < 0)
                     continue;
 
                 for (int y = center_y - pen_thickness; y <= center_y + pen_thickness; y++)
@@ -258,7 +258,7 @@ namespace FreeDraw
         public void MarkPixelToChange(int x, int y, Color color, Color32[] textureColors)
         {
             // Need to transform x and y coordinates to flat coordinates of array
-            int array_pos = y * (int) drawable_sprite.rect.width + x;
+            int array_pos = y * (int)drawable_sprite.rect.width + x;
 
             // Check if this is a valid position
             if (array_pos > textureColors.Length || array_pos < 0)
@@ -280,8 +280,8 @@ namespace FreeDraw
         public void ColourPixels(Vector2 center_pixel, int pen_thickness, Color color_of_pen)
         {
             // Figure out how many pixels we need to colour in each direction (x and y)
-            int center_x = (int) center_pixel.x;
-            int center_y = (int) center_pixel.y;
+            int center_x = (int)center_pixel.x;
+            int center_y = (int)center_pixel.y;
             //int extra_radius = Mathf.Min(0, pen_thickness - 2);
 
             for (int x = center_x - pen_thickness; x <= center_x + pen_thickness; x++)
@@ -333,7 +333,7 @@ namespace FreeDraw
             current_brush = PenBrush;
 
             // Initialize clean pixels to use
-            clean_colours_array = new Color[(int) drawable_sprite.rect.width * (int) drawable_sprite.rect.height];
+            clean_colours_array = new Color[(int)drawable_sprite.rect.width * (int)drawable_sprite.rect.height];
             for (int x = 0; x < clean_colours_array.Length; x++)
                 clean_colours_array[x] = Reset_Colour;
 
@@ -344,7 +344,7 @@ namespace FreeDraw
 
         private void Reset()
         {
-            clean_colours_array = new Color[(int) drawable_sprite.rect.width * (int) drawable_sprite.rect.height];
+            clean_colours_array = new Color[(int)drawable_sprite.rect.width * (int)drawable_sprite.rect.height];
             ResetCanvas(drawable_texture);
         }
     }
