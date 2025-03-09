@@ -4,6 +4,7 @@ using System.Linq;
 using FreeDraw;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class RecognitionManager : MonoBehaviour
@@ -114,7 +115,7 @@ public class RecognitionManager : MonoBehaviour
             string resultText = "";
             if (result.Item2 <= 0)
             {
-                resultText = "No spell recognized ):      Drawing!!!";
+                resultText = "No spell recognized ):";
             }
             else if (_currentRecognizer is DollarOneRecognizer)
             {
@@ -123,7 +124,8 @@ public class RecognitionManager : MonoBehaviour
             else if (_currentRecognizer is DollarPRecognizer)
             {
                 resultText = $"Recognized: {result.Item1}, Weakness Factor: {result.Item2}";
-                ParticleManager.Instance.SpawnParticle(result.Item1, result.Item2);
+                if (SceneManager.GetActiveScene().name != "Startup")
+                    ParticleManager.Instance.SetParticle(result.Item1, result.Item2);
                 Drawable.drawable.enabled = false;
             }
 
